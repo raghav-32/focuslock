@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">FocusLock</string>
+    <string name="accessibility_service_description">FocusLock uses this service only to notice which app is in the foreground and, for apps where you turned on a feed rule, whether a short-video feed screen is showing. It does not read messages or passwords, does not take screenshots, and does not send anything off your device. You can switch it off at any time.</string>
+</resources>
