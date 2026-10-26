@@ -324,6 +324,20 @@ fun RecoveryScreen(permissions: PermissionState, onBack: () -> Unit) {
                 )
                 Button(onClick = { context.openSettings(SettingsIntents.accessibility()) }) { Text("Open Accessibility settings") }
             }
+            if (SettingsIntents.isXiaomiFamily()) {
+                InfoCard {
+                    Text("Xiaomi / Redmi / POCO (HyperOS, MIUI)", fontWeight = FontWeight.SemiBold)
+                    Text("These phones stop background apps and hide block screens unless you allow all of the following:")
+                    Text("1. Autostart: ON for FocusLock.")
+                    Button(onClick = { context.openSettings(SettingsIntents.xiaomiAutostart()) }) { Text("Open Autostart") }
+                    Text("2. Other permissions → \"Display pop-up windows while running in the background\": Allow. Without it the block screen cannot appear over other apps.")
+                    Button(onClick = { context.openSettings(SettingsIntents.xiaomiOtherPermissions(context)) }) { Text("Open FocusLock permissions") }
+                    Text("3. Battery saver: No restrictions (App info → Battery saver).")
+                    Text("4. Recent apps: press and hold the FocusLock card and tap the lock icon so it is not cleaned.")
+                    Text("5. After the phone kills FocusLock, switch it off and on again in Accessibility.")
+                    Button(onClick = { context.openSettings(SettingsIntents.appDetails(context)) }) { Text("Open App info") }
+                }
+            }
             InfoCard {
                 Text("I am locked out of an app I need", fontWeight = FontWeight.SemiBold)
                 Text("• Use \"Emergency access\" on the block screen (unless the session is strict).")

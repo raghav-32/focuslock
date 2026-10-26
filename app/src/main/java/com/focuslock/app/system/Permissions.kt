@@ -80,6 +80,19 @@ object SettingsIntents {
     fun notifications(context: Context) = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
         .putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
 
+    fun isXiaomiFamily(): Boolean = Build.MANUFACTURER.lowercase() in setOf("xiaomi", "redmi", "poco")
+
+    /** Xiaomi/HyperOS Security app: Autostart list. */
+    fun xiaomiAutostart() = Intent().setClassName(
+        "com.miui.securitycenter",
+        "com.miui.permcenter.autostart.AutoStartManagementActivity",
+    )
+
+    /** Xiaomi/HyperOS: per-app "Other permissions" (Display pop-up windows while running in the background). */
+    fun xiaomiOtherPermissions(context: Context) = Intent("miui.intent.action.APP_PERM_EDITOR")
+        .setClassName("com.miui.securitycenter", "com.miui.permcenter.permissions.PermissionsEditorActivity")
+        .putExtra("extra_pkgname", context.packageName)
+
     /** Needed on Android 13+ for sideloaded builds: "Allow restricted settings" lives here. */
     fun appDetails(context: Context) = Intent(
         Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
@@ -90,10 +103,10 @@ object SettingsIntents {
 fun Context.openSettings(intent: Intent) {
     try {
         startActivity(intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-    } catch (e: ActivityNotFoundException) {
+    } catch (e: Exception) {
         try {
             startActivity(Intent(Settings.ACTION_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-        } catch (e2: ActivityNotFoundException) {
+        } catch (e2: Exception) {
             // Nothing else we can do; the UI keeps showing the permission as missing.
         }
     }

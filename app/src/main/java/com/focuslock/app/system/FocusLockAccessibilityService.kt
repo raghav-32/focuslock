@@ -138,8 +138,20 @@ class FocusLockAccessibilityService : AccessibilityService() {
             .putExtra(BlockActivity.EXTRA_SOURCE_NAME, decision.sourceName)
             .putExtra(BlockActivity.EXTRA_ENDS_AT, decision.endsAtWall ?: 0L)
             .putExtra(BlockActivity.EXTRA_STRICT, decision.strict)
+        Diagnostics.log(this, "block ${decision.kind} ${decision.packageName}")
+        // Always send the user away from the blocked app first. Some phones (Xiaomi/HyperOS) refuse to
+        // show a screen over another app unless a special permission is on; blocking must still work.
+        if (decision.kind == RuleKind.APP) performGlobalAction(GLOBAL_ACTION_HOME)
         try {
-            startActivity(intent)
+            if (decision.kind == RuleKind.APP) {
+                android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                    try { startActivity(intent) } catch (t: Throwable) {
+                        Diagnostics.logCrash(this, "launch BlockActivity", t)
+                    }
+                }, 120L)
+            } else {
+                startActivity(intent)
+            }
         } catch (t: Throwable) {
             // Fall back to sending the user home so a blocked app never stays usable by accident.
             Diagnostics.logCrash(this, "launch BlockActivity", t)
