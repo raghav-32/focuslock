@@ -33,6 +33,7 @@ class FocusLockAccessibilityService : AccessibilityService() {
         super.onServiceConnected()
         ServiceStatus.connected = true
         Diagnostics.log(this, "service connected")
+        KeepAliveService.start(this)
         try {
             gate.reset()
             container.ruleStore.refreshEssentials()
@@ -202,6 +203,7 @@ class FocusLockAccessibilityService : AccessibilityService() {
     override fun onUnbind(intent: Intent?): Boolean {
         ServiceStatus.connected = false
         Diagnostics.log(this, "service unbound")
+        KeepAliveService.stop(this)
         gate.reset()
         return super.onUnbind(intent)
     }

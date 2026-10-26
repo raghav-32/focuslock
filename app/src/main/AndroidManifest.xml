@@ -4,6 +4,8 @@
 
     <!-- Notifications (runtime permission on Android 13+). Optional: blocking works without it. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <!-- Re-plan schedules/session alarms after the phone restarts. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!-- "Usage access": granted by the user in system settings, never via a runtime dialog.
@@ -57,6 +59,15 @@
             android:launchMode="singleTask"
             android:taskAffinity=""
             android:theme="@style/Theme.FocusLock" />
+
+        <service
+            android:name=".system.KeepAliveService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="Keeps the app-blocking accessibility service from being stopped by the phone's task killer" />
+        </service>
 
         <service
             android:name=".system.FocusLockAccessibilityService"
