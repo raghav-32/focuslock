@@ -3,9 +3,20 @@
 set -u
 APP=com.focuslock.app
 SVC=$APP/com.focuslock.app.system.FocusLockAccessibilityService
-OUT=ci-out; mkdir -p $OUT
+OUT=ci-out; mkdir -p $OUT; : > $OUT/summary.txt
 fail=0
 say() { echo "=== $*"; }
+exec > >(tee -a $OUT/summary.txt) 2>&1
+report() {
+  sleep 1
+  # Publish the summary as a run annotation (readable without downloading artifacts).
+  msg=$(tail -c 3500 $OUT/summary.txt | sed ':a;N;$!ba;s/%/%25/g;s/\r/%0D/g;s/\n/%0A/g')
+  echo "::notice title=emulator-summary::$msg"
+  for f in diagnostics.txt logcat.txt; do
+    [ -f $OUT/$f ] && { m=$(tail -c 3000 $OUT/$f | sed ':a;N;$!ba;s/%/%25/g;s/\r/%0D/g;s/\n/%0A/g'); echo "::notice title=$f::$m"; }
+  done
+}
+trap report EXIT
 
 adb install -r -t app/build/outputs/apk/debug/app-debug.apk || exit 1
 adb install -r -t app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk || exit 1
