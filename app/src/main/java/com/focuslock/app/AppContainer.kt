@@ -29,7 +29,13 @@ import kotlinx.coroutines.SupervisorJob
  * and everything survives only as long as the process; all durable state is in Room / DataStore.
  */
 class AppContainer(val app: Application) {
-    val scope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+    val scope = CoroutineScope(
+        SupervisorJob() + Dispatchers.Default +
+            kotlinx.coroutines.CoroutineExceptionHandler { _, t ->
+                // A failed background job must never take the whole process (and the blocking service) down.
+                com.focuslock.app.system.Diagnostics.logCrash(app, "background job", t)
+            },
+    )
 
     val time: TimeSource = SystemTimeSource(app)
     val db: FocusLockDatabase by lazy { FocusLockDatabase.build(app) }

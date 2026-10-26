@@ -32,9 +32,14 @@ class FocusLockAccessibilityService : AccessibilityService() {
     override fun onServiceConnected() {
         super.onServiceConnected()
         ServiceStatus.connected = true
-        gate.reset()
-        container.ruleStore.refreshEssentials()
-        Log.d(TAG, "service connected")
+        Diagnostics.log(this, "service connected")
+        try {
+            gate.reset()
+            container.ruleStore.refreshEssentials()
+        } catch (t: Throwable) {
+            // Staying connected with a stale snapshot beats crashing and being marked "malfunctioning".
+            Diagnostics.logCrash(this, "onServiceConnected", t)
+        }
     }
 
     override fun onAccessibilityEvent(event: AccessibilityEvent?) {
@@ -59,9 +64,10 @@ class FocusLockAccessibilityService : AccessibilityService() {
                     evaluateApp(pkg, foregroundChanged = false)
                 }
             }
-        } catch (e: Exception) {
+        } catch (t: Throwable) {
             // A bug or a recycled node must never take the service down.
-            Log.w(TAG, "event handling failed: ${e.javaClass.simpleName}")
+            Log.w(TAG, "event handling failed: ${t.javaClass.simpleName}")
+            Diagnostics.logCrash(this, "onAccessibilityEvent", t)
         }
     }
 
@@ -134,8 +140,9 @@ class FocusLockAccessibilityService : AccessibilityService() {
             .putExtra(BlockActivity.EXTRA_STRICT, decision.strict)
         try {
             startActivity(intent)
-        } catch (e: Exception) {
+        } catch (t: Throwable) {
             // Fall back to sending the user home so a blocked app never stays usable by accident.
+            Diagnostics.logCrash(this, "launch BlockActivity", t)
             performGlobalAction(GLOBAL_ACTION_HOME)
         }
     }
@@ -182,12 +189,14 @@ class FocusLockAccessibilityService : AccessibilityService() {
 
     override fun onUnbind(intent: Intent?): Boolean {
         ServiceStatus.connected = false
+        Diagnostics.log(this, "service unbound")
         gate.reset()
         return super.onUnbind(intent)
     }
 
     override fun onDestroy() {
         ServiceStatus.connected = false
+        Diagnostics.log(this, "service destroyed")
         super.onDestroy()
     }
 

@@ -14,6 +14,8 @@ class FocusLockApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        com.focuslock.app.system.Diagnostics.installCrashHandler(this)
+        com.focuslock.app.system.Diagnostics.log(this, "process started")
         container = AppContainer(this)
         container.notifier.ensureChannels()
         container.scope.launch {

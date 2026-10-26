@@ -30,7 +30,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.layout.FlowRow
@@ -400,6 +402,7 @@ fun AboutScreen(onBack: () -> Unit) {
                 Text("• Some phone makers restrict background apps; set battery use to Unrestricted.")
                 Text("• Phone, Settings, keyboards and your home launcher are never blocked.")
             }
+            DiagnosticsCard()
             InfoCard {
                 Text("Rule priority", fontWeight = FontWeight.SemiBold)
                 Text(
@@ -407,6 +410,30 @@ fun AboutScreen(onBack: () -> Unit) {
                         "the reason shown is focus session, then schedule, then always-blocked list. Whole-app blocks beat feed rules.",
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun DiagnosticsCard() {
+    val context = LocalContext.current
+    val clipboard = LocalClipboardManager.current
+    var text by remember { mutableStateOf(com.focuslock.app.system.Diagnostics.read(context)) }
+    InfoCard {
+        Text("Diagnostics", fontWeight = FontWeight.SemiBold)
+        Text(
+            "A local log of technical events (service connected / stopped, crashes). It stays on this phone. " +
+                "If something breaks, tap Copy and send it to whoever is helping you.",
+            style = MaterialTheme.typography.bodySmall,
+        )
+        Text(text, style = MaterialTheme.typography.bodySmall, fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Button(onClick = { clipboard.setText(AnnotatedString(text)) }) { Text("Copy") }
+            OutlinedButton(onClick = { text = com.focuslock.app.system.Diagnostics.read(context) }) { Text("Refresh") }
+            OutlinedButton(onClick = {
+                com.focuslock.app.system.Diagnostics.clear(context)
+                text = com.focuslock.app.system.Diagnostics.read(context)
+            }) { Text("Clear") }
         }
     }
 }
