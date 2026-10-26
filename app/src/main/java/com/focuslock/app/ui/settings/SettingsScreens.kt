@@ -386,6 +386,7 @@ fun AboutScreen(onBack: () -> Unit) {
                 Text("Version ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
                 Text("Build date ${BuildConfig.BUILD_DATE}")
                 Text(BuildConfig.APPLICATION_ID, style = MaterialTheme.typography.bodySmall)
+                Text("Created by NEPUS", fontWeight = FontWeight.SemiBold)
             }
             InfoCard {
                 Text("How blocking works", fontWeight = FontWeight.SemiBold)

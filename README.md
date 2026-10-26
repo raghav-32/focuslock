@@ -1,5 +1,7 @@
 # FocusLock — App & Feed Blocker
 
+Created by **NEPUS**.
+
 Native Android app (Kotlin, Jetpack Compose, Material 3) that blocks distracting apps and, where the
 app exposes enough information, short-video feeds such as YouTube Shorts and Instagram Reels.
 
@@ -104,3 +106,7 @@ scripts/               SDK-free domain verification
 Schema version is 1 (first release); `exportSchema = true` writes JSON to `app/schemas/` on build.
 Never use destructive fallback: add a `Migration` in `FocusLockDatabase.kt`, commit the new schema, and add a
 `MigrationTestHelper` test (`androidTest`). The migration test is **not** written yet because no migration exists.
+
+## Credits
+
+Designed and created by NEPUS. © 2026 NEPUS.
